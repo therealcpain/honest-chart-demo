@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Honest Chart — CSV → verified chart</title>
+  <meta name="description" content="Paste or upload a CSV. Get a deterministic bar, line, or pie chart. SHA-256 fingerprint of your data on the page. Numbers never invented.">
+  <meta name="theme-color" content="#0f1419">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js UMD — deterministic render from your numbers only -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">HC</div>
+        <div>
+          <h1>Honest Chart</h1>
+          <p class="tagline">Your CSV. Exact numbers. Visible fingerprint.</p>
+        </div>
+      </div>
+      <span class="badge">No invented data</span>
+    </header>
+
+    <div class="grid">
+      <section class="panel" aria-labelledby="data-heading">
+        <h2 id="data-heading">1. Data</h2>
+        <label for="csvInput">Paste CSV</label>
+        <textarea id="csvInput" spellcheck="false" placeholder="Month,Revenue&#10;Jan,42000&#10;Feb,45500"></textarea>
+
+        <div class="row" style="margin-top:0.75rem">
+          <label class="btn file-btn" style="flex:1">
+            Upload CSV
+            <input id="fileInput" type="file" accept=".csv,text/csv,text/plain" />
+          </label>
+          <button type="button" class="btn btn-ghost" id="loadSample">Load sample.csv</button>
+        </div>
+        <p class="hint">Parsed entirely in your browser. Nothing is uploaded to a server.</p>
+
+        <div class="fingerprint" aria-live="polite">
+          <div><span class="k">SHA-256 of CSV text</span><br><span class="v" id="sha256">—</span></div>
+          <div><span class="k">Data rows</span> <span class="v" id="rowCount">0</span>
+            · <span class="k">Columns</span> <span class="v" id="colCount">0</span></div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="chart-heading">
+        <h2 id="chart-heading">2. Chart</h2>
+        <div class="row">
+          <div>
+            <label for="chartType">Type</label>
+            <select id="chartType">
+              <option value="bar">Bar</option>
+              <option value="line">Line</option>
+              <option value="pie">Pie</option>
+            </select>
+          </div>
+          <div>
+            <label for="labelCol">Label column</label>
+            <select id="labelCol"></select>
+          </div>
+          <div>
+            <label for="valueCol">Value column</label>
+            <select id="valueCol"></select>
+          </div>
+        </div>
+        <div style="margin-top:0.75rem">
+          <label for="chartTitle">Title (optional)</label>
+          <input id="chartTitle" type="text" placeholder="e.g. Monthly revenue" maxlength="120" />
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="renderBtn" disabled>Render chart</button>
+          <button type="button" class="btn" id="exportPng" disabled>Export PNG</button>
+          <button type="button" class="btn" id="shareBtn" disabled>Share link</button>
+        </div>
+        <div class="share-box" id="shareBox">
+          <label for="shareUrl">Share URL (hash-encoded chart spec + CSV)</label>
+          <div class="row">
+            <input id="shareUrl" type="text" readonly />
+            <button type="button" class="btn" id="copyShare" style="flex:0 0 auto">Copy</button>
+          </div>
+          <p class="hint">Append UTM when you post, e.g. <code>?utm_source=reddit&amp;utm_medium=organic&amp;utm_campaign=honest_chart_mvp</code></p>
+        </div>
+        <div class="chart-wrap" style="margin-top:0.85rem">
+          <div class="empty-state" id="emptyState">Load data, pick columns, then render.<br>Charts use only values present in your CSV.</div>
+          <canvas id="chartCanvas" role="img" aria-label="Honest Chart canvas"></canvas>
+        </div>
+        <p class="status" id="status" role="status"></p>
+      </section>
+    </div>
+
+    <footer>
+      <strong>Honest Chart</strong> — deterministic charts from your spreadsheet.
+      <ul>
+        <li>Client-side CSV parse + Chart.js render</li>
+        <li>SHA-256 fingerprint + row count shown before you share</li>
+        <li>Export PNG · optional URL-hash share for demos</li>
+      </ul>
+    </footer>
+  </div>
+</body>
+</html>
