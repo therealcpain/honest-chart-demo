@@ -89,8 +89,20 @@
           </div>
           <p class="hint">Append UTM when you post, e.g. <code>?utm_source=reddit&amp;utm_medium=organic&amp;utm_campaign=honest_chart_mvp</code></p>
         </div>
-        <div class="chart-wrap" style="margin-top:0.85rem">
-          <div class="empty-state" id="emptyState">Load data, pick columns, then render.<br>Charts use only values present in your CSV.</div>
+        <div class="chart-head">
+          <p class="chart-kicker">Answer</p>
+          <p class="chart-caption" id="chartCaption">No chart yet — load a CSV to see your numbers only.</p>
+        </div>
+        <div class="chart-wrap">
+          <div class="empty-state" id="emptyState">
+            <strong class="empty-title">No chart yet</strong>
+            <ol class="empty-steps">
+              <li>Paste or upload a CSV (or load sample)</li>
+              <li>Pick label + value columns</li>
+              <li>Render — only cells in your file are plotted</li>
+            </ol>
+            <p class="empty-foot">Honest Chart never invents series or dual axes.</p>
+          </div>
           <canvas id="chartCanvas" role="img" aria-label="Honest Chart canvas"></canvas>
         </div>
         <p class="status" id="status" role="status"></p>

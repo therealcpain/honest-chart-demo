@@ -26,6 +26,7 @@
     colCount: $("colCount"),
     status: $("status"),
     emptyState: $("emptyState"),
+    chartCaption: $("chartCaption"),
     chartCanvas: $("chartCanvas"),
   };
 
@@ -204,10 +205,15 @@
     els.shareBtn.disabled = !ready;
 
     if (!text.trim()) {
+      showEmpty("No chart yet — load a CSV to see your numbers only.");
       setStatus("Paste or upload a CSV to begin.");
     } else if (!ready) {
+      showEmpty("Need a header + ≥1 data row and two columns before rendering.");
       setStatus("Need a header row plus at least one data row and two columns.", "error");
     } else {
+      if (!chart && els.chartCaption) {
+        els.chartCaption.textContent = "Data ready — pick columns and render.";
+      }
       setStatus(`Parsed ${rows.length} data row(s), ${headers.length} column(s). Ready to chart.`, "ok");
     }
   }
@@ -261,6 +267,16 @@
     }
   }
 
+  function showEmpty(caption) {
+    destroyChart();
+    if (els.emptyState) els.emptyState.classList.remove("hidden");
+    if (els.chartCaption) {
+      els.chartCaption.textContent =
+        caption || "No chart yet — load a CSV to see your numbers only.";
+    }
+    els.exportPng.disabled = true;
+  }
+
   function renderChart() {
     try {
       const series = buildSeries();
@@ -268,19 +284,23 @@
       const title =
         els.chartTitle.value.trim() ||
         `${series.valueHeader} by ${series.labelHeader}`;
+      const subtitle = `${series.values.length} point(s) · ${series.valueHeader} · from your CSV only`;
 
       destroyChart();
       els.emptyState.classList.add("hidden");
+      if (els.chartCaption) {
+        els.chartCaption.textContent = subtitle;
+      }
 
       const palette = [
-        "#3d9cf0",
-        "#7c5cff",
-        "#3ecf8e",
-        "#f0b429",
-        "#ff7b72",
-        "#56d4dd",
+        "#5aadf5",
+        "#9b7bff",
+        "#4ade9f",
+        "#f5c542",
+        "#ff8f88",
+        "#6de0e8",
         "#f472b6",
-        "#a3e635",
+        "#b4f06a",
       ];
 
       const dataset =
@@ -295,13 +315,18 @@
           : {
               label: series.valueHeader,
               data: series.values,
-              backgroundColor: type === "bar" ? "rgba(61, 156, 240, 0.75)" : "rgba(61, 156, 240, 0.15)",
-              borderColor: "#3d9cf0",
+              backgroundColor: type === "bar" ? "rgba(90, 173, 245, 0.82)" : "rgba(90, 173, 245, 0.18)",
+              borderColor: "#5aadf5",
               borderWidth: 2,
               fill: type === "line",
               tension: 0.25,
-              pointRadius: type === "line" ? 3 : 0,
+              pointRadius: type === "line" ? 4 : 0,
+              pointHoverRadius: type === "line" ? 6 : 0,
             };
+
+      const tickColor = "#c5d0dc";
+      const gridColor = "rgba(70, 86, 104, 0.55)";
+      const axisTitleColor = "#e8eef4";
 
       chart = new Chart(els.chartCanvas.getContext("2d"), {
         type,
@@ -312,22 +337,43 @@
         options: {
           responsive: true,
           maintainAspectRatio: true,
+          layout: { padding: { top: 4, right: 8, bottom: 2, left: 2 } },
           plugins: {
             legend: {
               display: type === "pie",
-              labels: { color: "#8b9aab" },
+              position: "bottom",
+              labels: {
+                color: tickColor,
+                boxWidth: 12,
+                padding: 14,
+                font: { size: 12 },
+              },
             },
             title: {
               display: true,
               text: title,
-              color: "#e8eef4",
-              font: { size: 15, weight: "600" },
+              color: "#f2f6fa",
+              font: { size: 16, weight: "700" },
+              padding: { top: 4, bottom: 10 },
+            },
+            subtitle: {
+              display: true,
+              text: subtitle,
+              color: "#9aa8b8",
+              font: { size: 11 },
+              padding: { bottom: 8 },
             },
             tooltip: {
+              backgroundColor: "rgba(15, 20, 25, 0.95)",
+              titleColor: "#f2f6fa",
+              bodyColor: "#c5d0dc",
+              borderColor: "#3d4f63",
+              borderWidth: 1,
               callbacks: {
                 label(ctx) {
                   const v = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed;
-                  return `${ctx.dataset.label}: ${v}`;
+                  const name = ctx.label != null && type === "pie" ? `${ctx.label}: ` : "";
+                  return `${name}${ctx.dataset.label}: ${v}`;
                 },
               },
             },
@@ -337,12 +383,35 @@
               ? {}
               : {
                   x: {
-                    ticks: { color: "#8b9aab" },
-                    grid: { color: "rgba(46, 58, 72, 0.7)" },
+                    title: {
+                      display: true,
+                      text: series.labelHeader,
+                      color: axisTitleColor,
+                      font: { size: 12, weight: "600" },
+                    },
+                    ticks: {
+                      color: tickColor,
+                      maxRotation: 45,
+                      autoSkip: true,
+                      font: { size: 11 },
+                    },
+                    grid: { color: gridColor },
+                    border: { color: "#3d4f63" },
                   },
                   y: {
-                    ticks: { color: "#8b9aab" },
-                    grid: { color: "rgba(46, 58, 72, 0.7)" },
+                    title: {
+                      display: true,
+                      text: series.valueHeader,
+                      color: axisTitleColor,
+                      font: { size: 12, weight: "600" },
+                    },
+                    ticks: {
+                      color: tickColor,
+                      font: { size: 11 },
+                    },
+                    grid: { color: gridColor },
+                    border: { color: "#3d4f63" },
+                    beginAtZero: true,
                   },
                 },
         },
@@ -358,6 +427,7 @@
       setStatus(msg, "ok");
       return series;
     } catch (err) {
+      showEmpty("Could not render — fix columns or CSV, then try again.");
       setStatus(err.message || String(err), "error");
       throw err;
     }
