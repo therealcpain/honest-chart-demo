@@ -6,6 +6,9 @@
   <title>Honest Chart — CSV → verified chart</title>
   <meta name="description" content="Paste or upload a CSV. Get a deterministic bar, line, or pie chart. SHA-256 fingerprint of your data on the page. Numbers never invented.">
   <meta name="theme-color" content="#0f1419">
+  <!-- goatcounter-site: honestchart · instrumented 2026-09-13T15:30:01Z -->
+  <script data-goatcounter="https://honestchart.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -93,6 +96,25 @@
         <p class="status" id="status" role="status"></p>
       </section>
     </div>
+
+
+    <section class="panel" aria-labelledby="waitlist-heading" style="margin-top:1rem">
+      <h2 id="waitlist-heading">Want themes / team share?</h2>
+      <p class="hint">Free tool stays free. Leave email if you want branded themes or watermark-free team shares later — no spam.</p>
+      <form id="waitlistForm" action="https://formsubmit.co/steward@brewcityblockchain.com" method="POST" class="row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap">
+        <input type="hidden" name="_subject" value="[Honest Chart] waitlist">
+        <input type="hidden" name="product" value="Honest Chart">
+        <input type="hidden" name="page_url" value="https://therealcpain.github.io/honest-chart-demo/">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        <div style="flex:1;min-width:12rem">
+          <label for="waitlistEmail">Email</label>
+          <input id="waitlistEmail" name="email" type="email" required placeholder="you@company.com" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="waitlistBtn"
+          onclick="window.goatcounter &amp;&amp; goatcounter.count({path: '/cta/waitlist', title: 'Waitlist', event: true})">Join waitlist</button>
+      </form>
+    </section>
 
     <footer>
       <strong>Honest Chart</strong> — deterministic charts from your spreadsheet.

@@ -33,6 +33,14 @@
   let lastCsvText = "";
   let chart = null;
 
+  function gcEvent(path, title) {
+    try {
+      if (window.goatcounter && typeof goatcounter.count === "function") {
+        goatcounter.count({ path: path, title: title || path, event: true });
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   function setStatus(msg, kind) {
     els.status.textContent = msg || "";
     els.status.className = "status" + (kind ? " " + kind : "");
@@ -421,6 +429,7 @@
     els.shareUrl.value = url;
     els.shareBox.classList.add("visible");
     history.replaceState(null, "", `#hc=${b64}`);
+    gcEvent("/cta/share", "Share link");
     setStatus("Share link updated in the URL hash (spec + CSV encoded). Add UTM when you post.", "ok");
   }
 
@@ -429,6 +438,7 @@
     if (!url) return;
     try {
       await navigator.clipboard.writeText(url);
+      gcEvent("/cta/share_copy", "Copy share URL");
       setStatus("Share URL copied.", "ok");
     } catch (_) {
       els.shareUrl.select();
